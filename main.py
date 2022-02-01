@@ -9,6 +9,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import fitz
 import os
+from docx2pdf import convert
 import pathlib
 
 # root window
@@ -27,6 +28,7 @@ root.resizable(0, 0)
 def select_word_file():
     filetypes = (
         ('word files', '*.doc'),
+        ('word files', '*.docx')
     )
 
     filename_word = fd.askopenfilename(
@@ -51,20 +53,36 @@ def select_file():
     global proba
     proba = filename
 
+#function for converting word document to pdf file (first label frame)
+def convert_word_to_pdf():
+    input_word_file = str(proba_word)
+
+    # Save as PDF
+    radna_povrsina = os.path.join((os.environ['USERPROFILE']), 'Desktop')
+    output_word_to_pdf = os.path.splitext(input_word_file)[0]
+    overena_prijava = os.path.join(radna_povrsina, output_word_to_pdf)
+    convert(input_word_file, overena_prijava+".pdf")
+
+
 ##first label frame for konvertor word to pdf
 lf1 = ttk.LabelFrame(root, text='Konvertor word u pdf', width=320, height=160)
 lf1.grid(column=0, row=0, padx=20, pady=20, sticky=(N, S, E, W))
-
+#Button for open word file
 open_button_word = ttk.Button(
     lf1,
     text='Učitaj word',
     command=select_word_file
 )
 
-open_button_word.grid(column=0, row=0, sticky=tk.EW)
+open_button_word.grid(column=0, row=0, sticky=tk.E)
+#Button for convert word file to pdf
+convert_button_word = ttk.Button(
+    lf1,
+    text='Konvertuj word u pdf',
+    command=convert_word_to_pdf
+)
 
-def convert_word_to_pdf():
-
+convert_button_word.grid(column=1, row=0, sticky=tk.W)
 
 ##second label frame for konvertor image to pdf
 lf2 = ttk.LabelFrame(root, text='Konvertor slika u pdf', width=320, height=160)
