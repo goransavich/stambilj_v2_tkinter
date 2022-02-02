@@ -9,7 +9,8 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import fitz
 import os
-from docx2pdf import convert
+from PyPDF2 import PdfFileMerger, PdfFileReader
+import img2pdf
 import pathlib
 
 # root window
@@ -18,25 +19,21 @@ root.geometry("360x600")
 root.title('Štambilj')
 root.resizable(0, 0)
 
-# configure the grid
-#root.columnconfigure(0, weight=1)
-#root.columnconfigure(1, weight=3)
-#root.rowconfigure(0, weight=4)
-#root.rowconfigure(3, weight=4)
-
 #prozor za učitavanje word file
-def select_word_file():
+def select_image_file():
     filetypes = (
-        ('word files', '*.doc'),
-        ('word files', '*.docx')
+        ('image files', '*.png'),
+        ('image files', '*.jpeg'),
+        ('image files', '*.jpg'),
+        ('image files', '*.bmp'),
     )
 
-    filename_word = fd.askopenfilename(
+    filename_image = fd.askopenfilename(
         title='Učitaj dokument',
         initialdir='/',
         filetypes=filetypes)
-    global proba_word
-    proba_word = filename_word
+    global proba_image
+    proba_image = filename_image
 
 
 # Prozor za učitavanje prijave
@@ -53,40 +50,79 @@ def select_file():
     global proba
     proba = filename
 
-#function for converting word document to pdf file (first label frame)
-def convert_word_to_pdf():
-    input_word_file = str(proba_word)
+### function for load pdf files for merge ###
+def select_pdf_merge_file():
+    filetypes = (
+        ('pdf files', '*.pdf'),
+    )
+    filename_pdf = fd.askopenfilenames(
+        title='Učitaj PDF',
+        initialdir='/',
+        filetypes=filetypes)
+    global proba_pdf
+    proba_pdf = filename_pdf
 
-    # Save as PDF
+
+### function for converting image to pdf file (first label frame)###
+def convert_image_to_pdf():
+    input_image_file = str(proba_image)
+    name = os.path.basename(input_image_file)
+    image_name = name.split(".")[0]+".pdf"
     radna_povrsina = os.path.join((os.environ['USERPROFILE']), 'Desktop')
-    output_word_to_pdf = os.path.splitext(input_word_file)[0]
-    overena_prijava = os.path.join(radna_povrsina, output_word_to_pdf)
-    convert(input_word_file, overena_prijava+".pdf")
 
+    img = Image.open(input_image_file)
+    imgg = img.convert("RGB")
+    # provide path of folder where you want to save pdf with name
+    imgg.save(radna_povrsina+"\\"+image_name)
 
-##first label frame for konvertor word to pdf
-lf1 = ttk.LabelFrame(root, text='Konvertor word u pdf', width=320, height=160)
+### function for merge pdf files###
+def merge_pdf():
+    merger = PdfFileMerger()
+    radna_povrsina = os.path.join((os.environ['USERPROFILE']), 'Desktop')
+    for file in proba_pdf:
+        merger.append(file, import_bookmarks=False)
+    merger.write(radna_povrsina+"\merdzovano.pdf")
+
+##first label frame for konvertor image to pdf
+lf1 = ttk.LabelFrame(root, text='Konvertor slika u pdf', width=320, height=160)
 lf1.grid(column=0, row=0, padx=20, pady=20, sticky=(N, S, E, W))
 #Button for open word file
 open_button_word = ttk.Button(
     lf1,
-    text='Učitaj word',
-    command=select_word_file
+    text='Učitaj sliku',
+    command=select_image_file
 )
 
-open_button_word.grid(column=0, row=0, sticky=tk.E)
+open_button_word.grid(column=0, row=0, sticky=(E,W))
 #Button for convert word file to pdf
 convert_button_word = ttk.Button(
     lf1,
-    text='Konvertuj word u pdf',
-    command=convert_word_to_pdf
+    text='Konvertuj sliku u pdf',
+    command=convert_image_to_pdf
 )
 
-convert_button_word.grid(column=1, row=0, sticky=tk.W)
+convert_button_word.grid(column=1, row=0, sticky=(E, W))
 
-##second label frame for konvertor image to pdf
-lf2 = ttk.LabelFrame(root, text='Konvertor slika u pdf', width=320, height=160)
+##second label frame for merge pdf files
+lf2 = ttk.LabelFrame(root, text='Merdžovanje PDF', width=320, height=160)
 lf2.grid(column=0, row=1, padx=20, pady=20, sticky=(N, S, E, W))
+
+#button for open pdf files for merge
+open_button_merge_pdf = ttk.Button(
+    lf2,
+    text='Učitaj PDF',
+    command=select_pdf_merge_file
+)
+open_button_merge_pdf.grid(column=0, row=0, sticky=(E,W))
+
+#button for merge pdf files
+merge_button_pdf = ttk.Button(
+    lf2,
+    text='Merdžuj pdf',
+    command=merge_pdf
+)
+
+merge_button_pdf.grid(column=1, row=0, sticky=(E, W))
 
 ##third label frame for stavi stambilj
 lf3 = ttk.LabelFrame(root, text='Stavi štambilj', width=320, height=160)
