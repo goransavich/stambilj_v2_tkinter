@@ -15,25 +15,9 @@ import pathlib
 
 # root window
 root = tk.Tk()
-root.geometry("360x600")
+root.geometry("360x400")
 root.title('Štambilj')
 root.resizable(0, 0)
-
-#prozor za učitavanje word file
-def select_image_file():
-    filetypes = (
-        ('image files', '*.png'),
-        ('image files', '*.jpeg'),
-        ('image files', '*.jpg'),
-        ('image files', '*.bmp'),
-    )
-
-    filename_image = fd.askopenfilename(
-        title='Učitaj dokument',
-        initialdir='/',
-        filetypes=filetypes)
-    global proba_image
-    proba_image = filename_image
 
 
 # Prozor za učitavanje prijave
@@ -63,17 +47,6 @@ def select_pdf_merge_file():
     proba_pdf = filename_pdf
 
 
-### function for converting image to pdf file (first label frame)###
-def convert_image_to_pdf():
-    input_image_file = str(proba_image)
-    name = os.path.basename(input_image_file)
-    image_name = name.split(".")[0]+".pdf"
-    radna_povrsina = os.path.join((os.environ['USERPROFILE']), 'Desktop')
-
-    img = Image.open(input_image_file)
-    imgg = img.convert("RGB")
-    # provide path of folder where you want to save pdf with name
-    imgg.save(radna_povrsina+"\\"+image_name)
 
 ### function for merge pdf files###
 def merge_pdf():
@@ -83,33 +56,15 @@ def merge_pdf():
         merger.append(file, import_bookmarks=False)
     merger.write(radna_povrsina+"\merdzovano.pdf")
 
-##first label frame for konvertor image to pdf
-lf1 = ttk.LabelFrame(root, text='Konvertor slika u pdf', width=320, height=160)
-lf1.grid(column=0, row=0, padx=20, pady=20, sticky=(N, S, E, W))
-#Button for open word file
-open_button_word = ttk.Button(
-    lf1,
-    text='Učitaj sliku',
-    command=select_image_file
-)
 
-open_button_word.grid(column=0, row=0, sticky=(E,W))
-#Button for convert word file to pdf
-convert_button_word = ttk.Button(
-    lf1,
-    text='Konvertuj sliku u pdf',
-    command=convert_image_to_pdf
-)
 
-convert_button_word.grid(column=1, row=0, sticky=(E, W))
-
-##second label frame for merge pdf files
-lf2 = ttk.LabelFrame(root, text='Merdžovanje PDF', width=320, height=160)
-lf2.grid(column=0, row=1, padx=20, pady=20, sticky=(N, S, E, W))
+##first label frame for merge pdf files
+lf1 = ttk.LabelFrame(root, text='Merdžovanje PDF', width=360, height=160)
+lf1.grid(column=0, row=1, padx=20, pady=20, sticky=(N, S, E, W))
 
 #button for open pdf files for merge
 open_button_merge_pdf = ttk.Button(
-    lf2,
+    lf1,
     text='Učitaj PDF',
     command=select_pdf_merge_file
 )
@@ -117,21 +72,21 @@ open_button_merge_pdf.grid(column=0, row=0, sticky=(E,W))
 
 #button for merge pdf files
 merge_button_pdf = ttk.Button(
-    lf2,
+    lf1,
     text='Merdžuj pdf',
     command=merge_pdf
 )
 
 merge_button_pdf.grid(column=1, row=0, sticky=(E, W))
 
-##third label frame for stavi stambilj
-lf3 = ttk.LabelFrame(root, text='Stavi štambilj', width=320, height=160)
-lf3.grid(column=0, row=2, padx=20, pady=20, sticky=(N, S, E, W))
+##second label frame for stavi stambilj
+lf2 = ttk.LabelFrame(root, text='Stavi štambilj', width=360, height=160)
+lf2.grid(column=0, row=2, padx=20, pady=20, sticky=(N, S, E, W))
 
 # Dugme za učitavanje prijave
 
 open_button = ttk.Button(
-    lf3,
+    lf2,
     text='Učitaj prijavu',
     command=select_file
 )
@@ -140,17 +95,17 @@ open_button = ttk.Button(
 open_button.grid(column=0, row=0, columnspan = 2, sticky=tk.EW, padx=5, pady=5)
 
 # datum prijave
-datum_label = ttk.Label(lf3, text="Datum prijave")
+datum_label = ttk.Label(lf2, text="Datum prijave")
 datum_label.grid(column=0, row=1, sticky=tk.W, padx=5, pady=5)
 
-datum_entry = ttk.Entry(lf3)
+datum_entry = ttk.Entry(lf2)
 datum_entry.grid(column=1, row=1, sticky=tk.EW, padx=5, pady=5)
 
 # broj prijave
-broj_label = ttk.Label(lf3, text="Broj prijave")
+broj_label = ttk.Label(lf2, text="Broj prijave")
 broj_label.grid(column=0, row=2, sticky=tk.W, padx=5, pady=5)
 
-broj_entry = ttk.Entry(lf3)
+broj_entry = ttk.Entry(lf2)
 broj_entry.grid(column=1, row=2, sticky=tk.EW, padx=5, pady=5)
 
 
@@ -210,10 +165,10 @@ def stavi_stambilj():
 
     file_handle.save(overena_prijava)
 
-    #os.system(overena_prijava)
+
 
 # Završi button
-zavrsi_button = ttk.Button(lf3, text="Završi", command=stavi_stambilj)
+zavrsi_button = ttk.Button(lf2, text="Završi", command=stavi_stambilj)
 zavrsi_button.grid(column=0, row=3, columnspan = 2, sticky=tk.EW, padx=5, pady=5)
 
 
